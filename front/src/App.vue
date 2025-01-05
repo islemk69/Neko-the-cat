@@ -31,19 +31,33 @@
       <div class="chat-header">
         <div class="token-address">
           <p>NEKO THE CAT</p>
-          <p><span>5voS9evDjxF589WuEub5i4ti7FWQmZCsAsyD5ucbuRqM</span></p>
+          <div class="token">
+            <p><span>5voS9evDjxF589WuEub5i4ti7FWQmZCsAsyD5ucbuRqM</span> </p>
+            <img src="/copy.png" class="copy" alt="copy" width="12px" height="14px">
+          </div>
         </div>
         <button class="btn connect-button">CONNECT</button>
       </div>
-      <div class="messages"></div>
+      <div class="messages">
+        <div class="message user-message">
+         <p class="text user-text">sdas</p>
+        </div>
+        <div class="message neeko-message">
+          <img src="/neeko-profile.png" class="neeko-profile" alt="neeko profile">
+          <div class="neeko-text-container">
+            <p class="text neeko-text">WAKY WAKY, I’m neko</p>
+            <p class="text neeko-text">Make yourself comfortable and let's chat.</p>
+          </div>
+        </div>
+      </div>
       <div class="input">
         <input type="text" placeholder="SPEAK WITH NEEKO..">
-        <img src="/send.png" alt="send" width="26px" height="23px">
+        <img src="/send.png" class="send" alt="send" width="22px" height="20px">
       </div>
     </div>
     <div class="social-container">
-      <img src="/dex.png" alt="dex" width="28px" height="34px">
-      <img src="/twitter.png" alt="twitter" width="37px" height="30px">
+      <img src="/dex.png" class="social" alt="dex" width="28px" height="34px">
+      <img src="/twitter.png" class="social" alt="twitter" width="37px" height="30px">
     </div>
   </div>
 </template>
@@ -83,8 +97,6 @@
     all: unset;
     cursor: pointer;
     color: white;
-    background: linear-gradient(90deg, #8540c1, #313487);
-    box-shadow: 0 0 10px rgba(133, 64, 193, 0.6), 0 0 20px rgba(49, 52, 135, 0.6);
     border-radius: 1rem;
     padding: 1rem;
     text-align: center;
@@ -98,21 +110,44 @@
 
   .landing-button {
     margin-bottom: 5rem;
-    width: 300px;
+    font-size: 16px;
+    width: 20rem;
     height: 30px;
+    background: linear-gradient(91.67deg, rgba(133, 64, 193, 0.66) 0.04%, rgba(49, 52, 135, 0.66) 99.96%);
+    box-shadow: 0px 0px 28.1px 4px #6212A8;
+    backdrop-filter: blur(4.85px);
+    padding: 17px 67px;
   }
+
+  .landing-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 1rem; /* Applique les coins arrondis */
+    padding: 2px; /* Épaisseur de la bordure simulée */
+    background: linear-gradient(90deg, #D7A8FF 0%, #36E5D3 100%);
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor; /* Masque la partie intérieure */
+    mask-composite: exclude; /* Masque la partie intérieure */
+    z-index: -1; /* Place le pseudo-élément derrière le bouton */
+}
 
   .chat-page{
     height: 100vh;
     width: 100%;
-    padding: 8rem;
+    padding: 8rem 5rem;
     position: relative;
   }
 
   .chatbot{
     height: 100%;
-    width: 53rem;
-    padding: 20px;
+    width: 57rem;
+    padding: 25px;
     color: white;
     backdrop-filter: blur(13.15px); /* Applique un flou à l'arrière-plan */
     -webkit-backdrop-filter: blur(13.15px); /* Compatibilité avec Safari */
@@ -121,6 +156,24 @@
     /* Note: backdrop-filter has minimal browser support */
     border-radius: 40px;
   }
+
+  .chatbot::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 3rem; /* Applique les coins arrondis */
+    padding: 2px; /* Épaisseur de la bordure simulée */
+    background: linear-gradient(162.96deg, #36E5D3 11.73%, #313487 107.16%);
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor; /* Masque la partie intérieure */
+    mask-composite: exclude; /* Masque la partie intérieure */
+    z-index: -1; /* Place le pseudo-élément derrière le bouton */
+}
 
   .chat-header {
     width: 100%;
@@ -131,37 +184,124 @@
   }
 
   .token-address {
-    font-size: 13px;
+    font-size: 12px;
     display: flex;
+    height: 100%;
     flex-direction: column;
-    justify-content: center;
   }
 
   .token-address p span {
     font-weight: 500;
+    text-transform: uppercase;
   }
 
+  .token {
+    display: flex;
+    align-items: center;
+    margin-top: 0.3rem;
+  }
+
+  .copy {
+    margin-left: 1.5rem;
+    cursor: pointer;
+  }
+  
   .connect-button {
-    width: 100px;
+    width: 110px;
     font-size: 16px;
+    background: linear-gradient(91.67deg, rgba(133, 64, 193, 0.66) 0.04%, rgba(49, 52, 135, 0.66) 99.96%);
+    border: 1px solid #D29FFF;
+    backdrop-filter: blur(4.85px);
+    box-shadow: 0px 0px 28.1px 4px #8540C1;
+    border-radius: 10px;
   }
 
   .messages {
     height: 84%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .message {
+    width: 100%;
+    min-height: 10%;
+    background-color: red;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    margin: 1rem 0;
+    display: flex;
+    padding: 16px 25px;
+    text-wrap: wrap;
+    overflow-wrap: break-word; /* Compatibilité moderne */
+  }
+
+  .message:first-child {
+    margin-top: 2rem;
+  }
+
+  .user-message {
+    background: transparent;
+    flex-direction: column;
+  }
+
+  .neeko-message {
+    background: rgba(0, 0, 0, 0.23);
+    align-items: center;
+  }
+
+  .neeko-message img {
+    width: 66px;
+    height: 66px;
+  }
+
+  .text {
+    font-weight: 200;
+    font-size: 14px;
+    line-height: 19px;
+    text-transform: uppercase;
+    text-wrap: wrap;
+  }
+
+  .neeko-text {
+    margin-left: 2rem;
+  }
+
+  .user-text {
+    align-self: flex-end;
   }
 
   .input {
     height: 10%;
     border-radius: 30px;
-    border: 1.5px solid #36E5D3;
     display: flex;
     align-items: center;
     justify-content: space-around;
-    background: linear-gradient(90deg, #8540c1, #313487);
+    background: linear-gradient(91.67deg, rgba(133, 64, 193, 0.66) 0.04%, rgba(49, 52, 135, 0.66) 99.96%);
+    box-shadow: 0px 0px 28.1px 4px rgba(98, 18, 168, 0.49);
+    backdrop-filter: blur(4.85px);
   }
 
+  .input::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 3rem; /* Applique les coins arrondis */
+    padding: 2px; /* Épaisseur de la bordure simulée */
+    background: linear-gradient(90deg, #D7A8FF 0%, #36E5D3 100%);
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor; /* Masque la partie intérieure */
+    mask-composite: exclude; /* Masque la partie intérieure */
+    z-index: -1; /* Place le pseudo-élément derrière le bouton */
+}
+
   .input img {
-    margin-right: 2rem;
+    margin-right: 3rem;
+    cursor: pointer;
   }
 
   .input input {
@@ -184,7 +324,7 @@
     position: absolute;
     width: 85px;
     height: 50px;
-    right: 8rem;
+    right: 10rem;
     bottom: 8rem;
     display: flex;
     align-items: center;
@@ -193,7 +333,9 @@
   }
 
   .social {
+    cursor: pointer;
   }
+
 
 
 </style>
