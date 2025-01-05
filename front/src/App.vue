@@ -1,5 +1,6 @@
 <script setup>
-  import {ref} from "vue"
+  import { ref } from "vue"
+  import axios from "axios";
 
   const showChatPage = ref(false);
 
@@ -9,6 +10,38 @@
     setTimeout(() => {
       document.querySelector(".chat-page").scrollIntoView({ behavior: "smooth" });
     }, 100); // Permet un scroll fluide
+  }
+
+  const messages = ref([
+  ]);
+
+  const userInput = ref("");
+
+  const sendMessage = async () => {
+    const userMessage = userInput.value.trim();
+    if (!userMessage)
+      return ;
+    messages.value.push({ text: userMessage, sender: "user" });
+    userInput.value = ""; // Clear input field
+
+    try {
+      // Send message to the backend API
+      const response = await axios.post("http://localhost:3000/api/chat", {
+        message: userMessage,
+      });
+
+      // Add Neeko's response after a small delay
+      const botMessage = response.data.message;
+      setTimeout(() => {
+        messages.value.push({ text: botMessage, sender: "neeko" });
+      }, 500); // Simulated delay
+    } catch (error) {
+      console.error("Error sending message:", error);
+      messages.value.push({
+        text: "Sorry, something went wrong. Please try again later.",
+        sender: "neeko",
+      });
+    }
   }
 
 </script>
@@ -39,19 +72,22 @@
         <button class="btn connect-button">CONNECT</button>
       </div>
       <div class="messages">
-        <div class="message user-message">
-         <p class="text user-text">sdas</p>
-        </div>
-        <div class="message neeko-message">
-          <img src="/neeko-profile.png" class="neeko-profile" alt="neeko profile">
-          <div class="neeko-text-container">
-            <p class="text neeko-text">WAKY WAKY, I’m neko</p>
-            <p class="text neeko-text">Make yourself comfortable and let's chat.</p>
-          </div>
+        <div
+          v-for="(message, index) in messages"
+          :key="index"
+          :class="['message', message.sender === 'user' ? 'user-message' : 'neeko-message']"
+        >
+          <template v-if="message.sender === 'neeko'">
+            <img src="/neeko-profile.png" class="neeko-profile" alt="neeko profile" />
+            <p class="text neeko-text">{{ message.text }}</p>
+          </template>
+          <template v-else>
+            <p class="text user-text">{{ message.text }}</p>
+          </template>
         </div>
       </div>
       <div class="input">
-        <input type="text" placeholder="SPEAK WITH NEEKO..">
+        <input type="text" placeholder="SPEAK WITH NEEKO.." @keydown.enter="sendMessage" v-model="userInput">
         <img src="/send.png" class="send" alt="send" width="22px" height="20px">
       </div>
     </div>
@@ -64,10 +100,10 @@
 
 <style scoped>
   .landing-page {
-    height: 100vh; /* La hauteur prend toute la page */
-    width: 100%;   /* La largeur prend tout l'écran */
-    overflow: hidden; /* Empêche tout débordement */
-    display: flex; /* Centrage optionnel */
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
