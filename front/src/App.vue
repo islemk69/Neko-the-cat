@@ -1,8 +1,9 @@
 <script setup>
-  import { ref } from "vue"
+  import { ref, onMounted, onBeforeUnmount, nextTick } from "vue"
   import axios from "axios";
 
   const showChatPage = ref(false);
+  const chatContainer = ref(null); // Ref pour cibler .messages
 
   const displayChatPage = () => {
     console.log('yoo')
@@ -17,6 +18,14 @@
 
   const userInput = ref("");
 
+  const scrollToBottom = () => {
+  const container = chatContainer.value;
+  if (container) {
+    container.scrollTop = container.scrollHeight;
+  }
+};
+
+
   const sendMessage = async () => {
     const userMessage = userInput.value.trim();
     if (!userMessage)
@@ -24,17 +33,18 @@
     messages.value.push({ text: userMessage, sender: "user" });
     userInput.value = ""; // Clear input field
 
+    await nextTick();
+    scrollToBottom();
     try {
       // Send message to the backend API
-      const response = await axios.post("http://localhost:3000/api/chat", {
+      const response = await axios.post("/api/chat", {
         message: userMessage,
       });
-
       // Add Neeko's response after a small delay
       const botMessage = response.data.message;
-      setTimeout(() => {
-        messages.value.push({ text: botMessage, sender: "neeko" });
-      }, 500); // Simulated delay
+      messages.value.push({ text: botMessage, sender: "neeko" });
+      await nextTick();
+      scrollToBottom();
     } catch (error) {
       console.error("Error sending message:", error);
       messages.value.push({
@@ -43,7 +53,34 @@
       });
     }
   }
+  const handleScroll = (event) => {
+  const container = chatContainer.value;
+  const isScrollingUp = event.deltaY < 0;
+  const isScrollingDown = event.deltaY > 0;
 
+  if (
+    (isScrollingUp && container.scrollTop === 0) || // En haut
+    (isScrollingDown && container.scrollTop + container.clientHeight >= container.scrollHeight) // En bas
+  ) {
+    event.preventDefault(); // Empêche le scroll global
+  }
+};
+
+// Ajouter l'écouteur d'événements au montage
+onMounted(() => {
+  const container = chatContainer.value;
+  if (container) {
+    container.addEventListener("wheel", handleScroll);
+  }
+});
+
+// Nettoyer l'écouteur d'événements avant le démontage
+onBeforeUnmount(() => {
+  const container = chatContainer.value;
+  if (container) {
+    container.removeEventListener("wheel", handleScroll);
+  }
+});
 </script>
 
 <template>
@@ -71,7 +108,7 @@
         </div>
         <button class="btn connect-button">CONNECT</button>
       </div>
-      <div class="messages">
+      <div class="messages" ref="chatContainer">
         <div
           v-for="(message, index) in messages"
           :key="index"
@@ -88,7 +125,7 @@
       </div>
       <div class="input">
         <input type="text" placeholder="SPEAK WITH NEEKO.." @keydown.enter="sendMessage" v-model="userInput">
-        <img src="/send.png" class="send" alt="send" width="22px" height="20px">
+        <img src="/send.png" class="send" alt="send" width="22px" height="20px" @click="sendMessage">
       </div>
     </div>
     <div class="social-container">
@@ -147,7 +184,7 @@
   .landing-button {
     margin-bottom: 5rem;
     font-size: 16px;
-    width: 20rem;
+    width: 15%;
     height: 30px;
     background: linear-gradient(91.67deg, rgba(133, 64, 193, 0.66) 0.04%, rgba(49, 52, 135, 0.66) 99.96%);
     box-shadow: 0px 0px 28.1px 4px #6212A8;
@@ -168,6 +205,9 @@
     -webkit-mask: 
       linear-gradient(#fff 0 0) content-box, 
       linear-gradient(#fff 0 0);
+    mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor; /* Masque la partie intérieure */
     mask-composite: exclude; /* Masque la partie intérieure */
     z-index: -1; /* Place le pseudo-élément derrière le bouton */
@@ -182,8 +222,8 @@
 
   .chatbot{
     height: 100%;
-    width: 57rem;
-    padding: 25px;
+    width: 40vw;
+    padding: 2.5rem;
     color: white;
     backdrop-filter: blur(13.15px); /* Applique un flou à l'arrière-plan */
     -webkit-backdrop-filter: blur(13.15px); /* Compatibilité avec Safari */
@@ -204,6 +244,9 @@
     padding: 2px; /* Épaisseur de la bordure simulée */
     background: linear-gradient(162.96deg, #36E5D3 11.73%, #313487 107.16%);
     -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    mask:
       linear-gradient(#fff 0 0) content-box, 
       linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor; /* Masque la partie intérieure */
@@ -256,6 +299,7 @@
     height: 84%;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
   }
 
   .message {
@@ -265,10 +309,10 @@
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.55);
     margin: 1rem 0;
-    display: flex;
     padding: 16px 25px;
     text-wrap: wrap;
     overflow-wrap: break-word; /* Compatibilité moderne */
+    flex-shrink: 0; /* Empêche le rétrécissement */
   }
 
   .message:first-child {
@@ -277,12 +321,14 @@
 
   .user-message {
     background: transparent;
+    display: flex;
     flex-direction: column;
   }
 
   .neeko-message {
     background: rgba(0, 0, 0, 0.23);
     align-items: center;
+    display: flex;
   }
 
   .neeko-message img {
@@ -330,6 +376,9 @@
     -webkit-mask: 
       linear-gradient(#fff 0 0) content-box, 
       linear-gradient(#fff 0 0);
+    mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor; /* Masque la partie intérieure */
     mask-composite: exclude; /* Masque la partie intérieure */
     z-index: -1; /* Place le pseudo-élément derrière le bouton */
@@ -367,11 +416,91 @@
     justify-content: space-between;
     z-index: 2;
   }
-
   .social {
     cursor: pointer;
   }
 
+
+
+  @media (max-width: 850px) {
+    .social-container {
+      bottom: 4vh;
+      padding: 0;
+      right: 50%;
+      transform: translateX(50%);
+    }
+
+    .chat-page{
+      display: flex;
+      justify-content: center;
+      position: relative;
+    }
+
+    .landing-button {
+      font-size: 1.2rem;
+      margin-bottom: 10rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chat-page {
+      display: flex;
+      padding: 0;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chatbot {
+      width: 80vw;
+      height: 50rem;
+      font-size: 1rem;
+    }
+
+
+    .chat-header {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .connect-button {
+      padding: 0.5rem 1rem;
+      width: 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      position: absolute;
+      top: 0.8rem;
+      right: 2rem;
+    }
+
+    .token-address {
+      font-size: 8px;
+    }
+
+    .copy {
+      width: 10px;
+      height: 12px;
+    }
+
+    .text {
+      font-size: 10px;
+    }
+
+    .input input {
+      font-size: 12px;
+    }
+
+    .input input::placeholder {
+      font-size: 12px;
+    }
+
+    .send {
+      width: "2px"; 
+      height: "2px";
+    }
+  }
 
 
 </style>
