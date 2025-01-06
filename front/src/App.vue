@@ -190,6 +190,7 @@ onBeforeUnmount(() => {
     box-shadow: 0px 0px 28.1px 4px #6212A8;
     backdrop-filter: blur(4.85px);
     padding: 17px 67px;
+    white-space: nowrap;
   }
 
   .landing-button::before {
@@ -266,6 +267,7 @@ onBeforeUnmount(() => {
     font-size: 12px;
     display: flex;
     height: 100%;
+    width: 100%;
     flex-direction: column;
   }
 
@@ -286,12 +288,15 @@ onBeforeUnmount(() => {
   }
   
   .connect-button {
-    width: 110px;
-    font-size: 16px;
+    width: 27%;
+    font-size: clamp(12px, 2.5vw, 16px); /* Taille entre 12px et 16px */
     background: linear-gradient(91.67deg, rgba(133, 64, 193, 0.66) 0.04%, rgba(49, 52, 135, 0.66) 99.96%);
     border: 1px solid #D29FFF;
     backdrop-filter: blur(4.85px);
     box-shadow: 0px 0px 28.1px 4px #8540C1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 10px;
   }
 
@@ -305,7 +310,6 @@ onBeforeUnmount(() => {
   .message {
     width: 100%;
     min-height: 10%;
-    background-color: red;
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.55);
     margin: 1rem 0;
@@ -422,18 +426,12 @@ onBeforeUnmount(() => {
 
 
 
-  @media (max-width: 850px) {
+  @media (max-width: 1250px) {
     .social-container {
       bottom: 4vh;
       padding: 0;
       right: 50%;
       transform: translateX(50%);
-    }
-
-    .chat-page{
-      display: flex;
-      justify-content: center;
-      position: relative;
     }
 
     .landing-button {
@@ -453,30 +451,12 @@ onBeforeUnmount(() => {
 
     .chatbot {
       width: 80vw;
-      height: 50rem;
+      height: 70vh;
       font-size: 1rem;
     }
-
-
-    .chat-header {
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .connect-button {
-      padding: 0.5rem 1rem;
-      width: 3rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 8px;
-      position: absolute;
-      top: 0.8rem;
-      right: 2rem;
-    }
-
+  
     .token-address {
-      font-size: 8px;
+      font-size: 10px;
     }
 
     .copy {
@@ -502,5 +482,27 @@ onBeforeUnmount(() => {
     }
   }
 
+
+  @media (max-width: 850px) {
+    .token-address {
+      font-size: 8px;
+      .copy {
+        width: 8px;
+        height: 10px;
+        margin-left: 1rem;
+    }
+    }
+  }
+
+  @media (max-width: 450px) {
+    .token-address {
+      font-size: 6px;
+    }
+    .copy {
+      width: 6px;
+      height: 8px;
+      margin-left: 0.2rem;
+    }
+  }
 
 </style>

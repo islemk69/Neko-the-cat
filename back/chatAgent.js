@@ -2,6 +2,7 @@ const { SolanaAgentKit } = require("solana-agent-kit");
 const { OpenAI } =  require("openai");
 const fs = require("fs");
 
+
 const openai = new OpenAI({ apiKey: "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" });
 
 // Initialisation de l'agent Solana

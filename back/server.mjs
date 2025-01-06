@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const { chatWithAgent } = require("./chatAgent");
+const { DirectClientInterface } = require("@elizaos/client-direct")
 
 const app = express();
 app.use(bodyParser.json());
