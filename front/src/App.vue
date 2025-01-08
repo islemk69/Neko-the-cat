@@ -37,7 +37,7 @@
     scrollToBottom();
     try {
       // Send message to the backend API
-      const response = await axios.post("/api/chat", {
+      const response = await axios.post("http://localhost:3001/api/chat", {
         message: userMessage,
       });
       // Add Neeko's response after a small delay

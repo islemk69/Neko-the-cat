@@ -1,9 +1,5 @@
-const { SolanaAgentKit } = require("solana-agent-kit");
-const { OpenAI } =  require("openai");
-const fs = require("fs");
 
-
-const openai = new OpenAI({ apiKey: "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" });
+const axios = require("axios");
 
 // Initialisation de l'agent Solana
 // const agent = new SolanaAgentKit(
@@ -11,27 +7,32 @@ const openai = new OpenAI({ apiKey: "sk-proj-Mhq_nc6EyfKIfCJh8GWq_5n2XhFm_YjOKPO
 //   "https://api.mainnet-beta.solana.com",
 //   "YOUR_OPENAI_API_KEY"
 // );
-const context = fs.readFileSync("neeko_context.txt", "utf-8");
-console.log(context)
 // Fonction de chat avec OpenAI via l'agent
+
 async function chatWithAgent(userMessage) {
   try {
-    // Appel à l'API OpenAI
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4", // Remplacez par le modèle souhaité
-      messages: [
-        {
-          role: "system",
-          content: 'You are Neeko the Cat, a playful and curious AI who loves helping humans.',
-        },
-        { role: "user", content: userMessage },
-      ],
-    });
+    // Formater la requête pour l'agent
+    const formData = new URLSearchParams();
+    formData.append("text", userMessage);
+    formData.append("userId", "user2"); // Identifiant utilisateur (peut être dynamique)
+    formData.append("roomId", "default-room-5c6863d4-e7b0-02ac-b245-149e5e251c91");
 
-    return completion.choices[0].message.content;
+    // Appel à l'agent IA
+    const response = await axios.post(
+      "http://localhost:3000/5c6863d4-e7b0-02ac-b245-149e5e251c91/message",
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+
+    // Retourner la réponse de l'IA
+    return response.data[0]?.text || "Pas de réponse de l'agent.";
   } catch (error) {
-    console.error("Erreur avec OpenAI :", error);
-    return "Désolé, une erreur est survenue.";
+    console.error("Erreur avec l'agent IA :", error.message);
+    return "Désolé, une erreur est survenue avec l'agent IA.";
   }
 }
 
