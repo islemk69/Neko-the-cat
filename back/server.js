@@ -11,7 +11,9 @@ app.use(cors());
 // Endpoint de chat
 app.post("/api/chat", async (req, res) => {
   const userMessage = req.body.message;
-  const botResponse = await chatWithAgent(userMessage);
+  const userId = req.body.userId;
+  const roomId = req.body.roomId;
+  const botResponse = await chatWithAgent(userMessage, userId, roomId);
   res.status(200).json({ message: botResponse });
 });
 

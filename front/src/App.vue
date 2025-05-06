@@ -1,10 +1,34 @@
 <script setup>
   import { ref, onMounted, onBeforeUnmount, nextTick } from "vue"
   import axios from "axios";
+  import { v4 as uuidv4 } from "uuid";
+
 
   const showChatPage = ref(false);
   const chatContainer = ref(null); // Ref pour cibler .messages
+  const userId = ref(""); // ID utilisateur
+  const roomId = ref(""); // ID de la salle
+  const showCopyMessage = ref(false);
 
+
+  const copyText = () => {
+  const textToCopy = document.getElementById("text-to-copy").innerText;
+
+  navigator.clipboard.writeText(textToCopy)
+    .then(() => {
+      // Affiche le message "Copied!"
+      const messageElement = document.getElementById("copy-message");
+      messageElement.classList.add("show");
+
+      // Cache le message après 2 secondes
+      setTimeout(() => {
+        messageElement.classList.remove("show");
+      }, 2000);
+    })
+    .catch((err) => {
+      console.error("Failed to copy text: ", err);
+    });
+};
   const displayChatPage = () => {
     console.log('yoo')
     showChatPage.value = true;
@@ -14,6 +38,7 @@
   }
 
   const messages = ref([
+  { text: "COSMIC EXPLORER WITH A TOUCH OF FELINE WHIMSY AND ADVANCED AI INSIGHTS. HOW CAN I ASSIST YOU ON THIS INTERGALACTIC", sender: "neeko" }
   ]);
 
   const userInput = ref("");
@@ -37,8 +62,10 @@
     scrollToBottom();
     try {
       // Send message to the backend API
-      const response = await axios.post("http://localhost:3001/api/chat", {
+      const response = await axios.post("/api/chat", {
         message: userMessage,
+        userId: userId.value,
+        roomId: roomId.value,
       });
       // Add Neeko's response after a small delay
       const botMessage = response.data.message;
@@ -72,6 +99,8 @@ onMounted(() => {
   if (container) {
     container.addEventListener("wheel", handleScroll);
   }
+  userId.value = uuidv4();
+  roomId.value = uuidv4();
 });
 
 // Nettoyer l'écouteur d'événements avant le démontage
@@ -84,14 +113,15 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <video autoplay loop muted>
+  <video autoplay loop muted preload="auto">
+    <source src="/landing.webm" type="video/webm" />
     <source src="/Landing_Page_Loop_2.mp4" type="video/mp4" />
     Votre navigateur ne prend pas en charge les vidéos HTML5.
   </video>
   <div class="landing-page">
     <div class="landing-text">
-      <p>41°24'12.2"N 2°10'26.5"</p>
-      <p><span>BUILT ON A16Z INFRASTRUCTURE</span></p>
+      <p>38.8830° N, 77.0164° W</p>
+      <p><span>powered by ElisaOS</span></p>
       <p>NEKO THE CAT</p>
     </div>
     <button class="btn landing-button" @click="displayChatPage">CLICK TO ENTER</button>
@@ -102,11 +132,13 @@ onBeforeUnmount(() => {
         <div class="token-address">
           <p>NEKO THE CAT</p>
           <div class="token">
-            <p><span>5voS9evDjxF589WuEub5i4ti7FWQmZCsAsyD5ucbuRqM</span> </p>
-            <img src="/copy.png" class="copy" alt="copy" width="12px" height="14px">
+            <p id="text-to-copy"> <span >XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</span></p>
+            <div class="copy-container">
+              <img src="/copy.png" id="copy-icon" class="copy" alt="copy" width="12px" height="14px" @click="copyText">
+              <span v-show="showCopyMessage" id="copy-message" class="copy-message">Copied!</span>
+          </div>
           </div>
         </div>
-        <button class="btn connect-button">CONNECT</button>
       </div>
       <div class="messages" ref="chatContainer">
         <div
@@ -124,13 +156,13 @@ onBeforeUnmount(() => {
         </div>
       </div>
       <div class="input">
-        <input type="text" placeholder="SPEAK WITH NEEKO.." @keydown.enter="sendMessage" v-model="userInput">
+        <input type="text" placeholder="SPEAK WITH NEKO.." @keydown.enter="sendMessage" v-model="userInput">
         <img src="/send.png" class="send" alt="send" width="22px" height="20px" @click="sendMessage">
       </div>
     </div>
     <div class="social-container">
-      <img src="/dex.png" class="social" alt="dex" width="28px" height="34px">
-      <img src="/twitter.png" class="social" alt="twitter" width="37px" height="30px">
+      <a href="" target="_blank"></a><img src="/dex.png" class="social" alt="dex" width="28px" height="34px">
+      <a href="https://x.com/nekosolai" target="_blank"><img src="/twitter.png" class="social" alt="twitter" width="37px" height="30px"></a>
     </div>
   </div>
 </template>
@@ -286,6 +318,34 @@ onBeforeUnmount(() => {
     margin-left: 1.5rem;
     cursor: pointer;
   }
+
+  .copy-container {
+  position: relative;
+  display: inline-block;
+}
+
+.copy-message {
+  visibility: hidden;
+  position: absolute;
+  top: -35px; /* Place le message au-dessus de l'icône */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #4caf50; /* Couleur de fond vert */
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 10;
+  opacity: 0; /* Commence invisible */
+  transition: opacity 0.3s ease, visibility 0.3s ease; /* Animation de visibilité */
+}
+
+.copy-message.show {
+  visibility: visible; /* Rendre visible */
+  opacity: 1; /* Augmenter l'opacité pour afficher */
+}
+
   
   .connect-button {
     width: 27%;
@@ -411,7 +471,7 @@ onBeforeUnmount(() => {
 
   .social-container {
     position: absolute;
-    width: 85px;
+    width: 100px;
     height: 50px;
     right: 10rem;
     bottom: 8rem;
@@ -424,6 +484,54 @@ onBeforeUnmount(() => {
     cursor: pointer;
   }
 
+  /* CSS */
+.button-6 {
+  align-items: center;
+  background-color: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: .55rem;
+  box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
+  box-sizing: border-box;
+  color: rgba(0, 0, 0, 0.85);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: system-ui,-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  justify-content: center;
+  line-height: 1.25;
+  margin: 0;
+  min-height: 3rem;
+  padding: calc(.875rem - 1px) calc(1.5rem - 1px);
+  position: relative;
+  text-decoration: none;
+  transition: all 250ms;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: baseline;
+  width: auto;
+}
+
+.button-6:hover,
+.button-6:focus {
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.button-6:hover {
+  transform: translateY(-1px);
+}
+
+.button-6:active {
+  background-color: #F0F0F1;
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: rgba(0, 0, 0, 0.06) 0 2px 4px;
+  color: rgba(0, 0, 0, 0.65);
+  transform: translateY(0);
+}
+
 
 
   @media (max-width: 1250px) {
@@ -432,6 +540,10 @@ onBeforeUnmount(() => {
       padding: 0;
       right: 50%;
       transform: translateX(50%);
+    }
+
+    .connect-button {
+      transform: scale(0);
     }
 
     .landing-button {
@@ -451,7 +563,7 @@ onBeforeUnmount(() => {
 
     .chatbot {
       width: 80vw;
-      height: 70vh;
+      height: 500px;
       font-size: 1rem;
     }
   
@@ -506,3 +618,8 @@ onBeforeUnmount(() => {
   }
 
 </style>
+
+
+
+
+

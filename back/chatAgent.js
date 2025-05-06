@@ -9,17 +9,17 @@ const axios = require("axios");
 // );
 // Fonction de chat avec OpenAI via l'agent
 
-async function chatWithAgent(userMessage) {
+async function chatWithAgent(userMessage, userId, roomId) {
   try {
     // Formater la requête pour l'agent
     const formData = new URLSearchParams();
     formData.append("text", userMessage);
-    formData.append("userId", "user2"); // Identifiant utilisateur (peut être dynamique)
-    formData.append("roomId", "default-room-5c6863d4-e7b0-02ac-b245-149e5e251c91");
+    formData.append("userId", userId); // Identifiant utilisateur (peut être dynamique)
+    formData.append("roomId", roomId);
 
     // Appel à l'agent IA
     const response = await axios.post(
-      "http://localhost:3000/5c6863d4-e7b0-02ac-b245-149e5e251c91/message",
+      "http://localhost:3000/27f69681-9bbf-0dcf-a2ef-6c9bcbff1bc1/message",
       formData,
       {
         headers: {
